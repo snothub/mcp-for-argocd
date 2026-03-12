@@ -1,0 +1,15 @@
+{{- if .Values.ingressRoute.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "argocd-mcp.fullname" . }}-tls
+  labels:
+    {{- include "argocd-mcp.labels" . | nindent 4 }}
+spec:
+  secretName: {{ .Values.ingressRoute.tls.secretName }}
+  issuerRef:
+    name: {{ .Values.ingressRoute.tls.clusterIssuer }}
+    kind: ClusterIssuer
+  dnsNames:
+    - {{ .Values.ingressRoute.host | quote }}
+{{- end }}

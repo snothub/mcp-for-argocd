@@ -21,12 +21,13 @@ argocd:
   readOnly: true
 
 ingressRoute:
-  enabled: false
+  enabled: true
   host: ""
   entryPoints:
   - websecure
   tls:
-    secretName: ""
+    secretName: argocd-mcp-tls
+    clusterIssuer: letsencrypt-prod
   middlewares: []
 
 resources:
