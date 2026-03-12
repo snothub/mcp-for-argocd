@@ -1,0 +1,40 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/snothub/mcp-for-argocd
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+
+service:
+  type: ClusterIP
+  port: 3000
+
+argocd:
+  baseUrl: ""
+  apiToken: ""
+  existingSecret: ""
+  readOnly: true
+
+ingressRoute:
+  enabled: false
+  host: ""
+  entryPoints:
+  - websecure
+  tls:
+    secretName: ""
+  middlewares: []
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+extraEnv: []

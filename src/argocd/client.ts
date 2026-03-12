@@ -9,6 +9,7 @@ import {
   V1alpha1ResourceResult,
   V1alpha1ApplicationResourceResult
 } from '../types/argocd-types.js';
+import { logger } from '../logging/logging.js';
 import { HttpClient } from './http.js';
 
 export class ArgoCDClient {
@@ -17,6 +18,7 @@ export class ArgoCDClient {
   private client: HttpClient;
 
   constructor(baseUrl: string, apiToken: string) {
+    logger.info('Connecting to Argo CD on baseUrl: %s', baseUrl);
     this.baseUrl = baseUrl;
     this.apiToken = apiToken;
     this.client = new HttpClient(this.baseUrl, this.apiToken);

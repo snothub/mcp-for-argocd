@@ -4,6 +4,7 @@ import packageJSON from '../../package.json' with { type: 'json' };
 import { ArgoCDClient } from '../argocd/client.js';
 import { z, ZodRawShape } from 'zod';
 import { V1alpha1Application, V1alpha1ResourceResult } from '../types/argocd-types.js';
+import { logger } from '../logging/logging.js';
 import {
   ApplicationNamespaceSchema,
   ApplicationSchema,
@@ -19,6 +20,7 @@ export class Server extends McpServer {
   private argocdClient: ArgoCDClient;
 
   constructor(serverInfo: ServerInfo) {
+    logger.info('Creating MCP Server with config: %o', serverInfo);
     super({
       name: packageJSON.name,
       version: packageJSON.version
@@ -26,7 +28,7 @@ export class Server extends McpServer {
     this.argocdClient = new ArgoCDClient(serverInfo.argocdBaseUrl, serverInfo.argocdApiToken);
 
     const isReadOnly =
-      String(process.env.MCP_READ_ONLY ?? '')
+      String(process.env.MCP_READ_ONLY ?? 'true') // Default to 'true' if not set, for safety
         .trim()
         .toLowerCase() === 'true';
 

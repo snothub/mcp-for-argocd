@@ -146,24 +146,23 @@ This disables TLS certificate validation for Node.js when connecting to Argo CD 
 
 ### Read Only Mode
 
-If you want to run the MCP Server in a ReadOnly mode to avoid resource or application modification, you should set the environment variable:
+MCP Server will as default run in a ReadOnly mode to avoid resource or application modification, you should set the environment variable to false to enable everything:
 ```
-"MCP_READ_ONLY": "true"
+"MCP_READ_ONLY": "false"
 ```
-This will disable the following tools:
+This will enable the following tools:
 - `create_application`
 - `update_application`
 - `delete_application`
 - `sync_application`
 - `run_resource_action`
 
-By default, all the tools will be available.
 
 ## For Development
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/argoproj-labs/mcp-for-argocd.git
+git clone https://github.com/snothub/mcp-for-argocd.git
 cd mcp-for-argocd
 ```
 

@@ -1,0 +1,15 @@
+argocd-mcp has been deployed!
+
+{{- if .Values.ingressRoute.enabled }}
+
+Access the MCP server at: https://{{ .Values.ingressRoute.host }}
+{{- else }}
+
+To access the MCP server, port-forward the service:
+
+  kubectl port-forward svc/{{ include "argocd-mcp.fullname" . }} 3000:{{ .Values.service.port }} -n {{ .Release.Namespace }}
+
+Then connect at: http://localhost:3000
+{{- end }}
+
+Configure your MCP client to use this server's URL as the HTTP transport endpoint.
