@@ -34,10 +34,8 @@ spec:
                 secretKeyRef:
                   name: {{ include "argocd-mcp.secretName" . }}
                   key: ARGOCD_API_TOKEN
-            {{- if .Values.argocd.readOnly }}
             - name: MCP_READ_ONLY
-              value: "true"
-            {{- end }}
+              value: {{ .Values.argocd.readOnly | quote }}
             {{- range .Values.extraEnv }}
             - name: {{ .name }}
               value: {{ .value | quote }}
