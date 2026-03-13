@@ -1,0 +1,12 @@
+{{- if .Values.auth.enabled }}
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ include "argocd-mcp.fullname" . }}-auth
+  labels:
+    {{- include "argocd-mcp.labels" . | nindent 4 }}
+spec:
+  forwardAuth:
+    address: http://{{ include "argocd-mcp.authFullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:8080/
+    trustForwardHeader: true
+{{- end }}

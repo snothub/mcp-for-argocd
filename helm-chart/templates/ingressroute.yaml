@@ -11,6 +11,11 @@ spec:
   routes:
     - match: Host(`{{ .Values.ingressRoute.host }}`)
       kind: Rule
+      {{- if .Values.auth.enabled }}
+      middlewares:
+        - name: {{ include "argocd-mcp.fullname" . }}-auth
+          namespace: {{ .Release.Namespace }}
+      {{- end }}
       services:
         - name: {{ include "argocd-mcp.fullname" . }}
           port: {{ .Values.service.port }}

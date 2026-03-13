@@ -1,0 +1,69 @@
+{{- if .Values.auth.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "argocd-mcp.authFullname" . }}
+  labels:
+    {{- include "argocd-mcp.labels" . | nindent 4 }}
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      {{- include "argocd-mcp.authSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "argocd-mcp.authSelectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: auth-verifier
+          image: "{{ .Values.auth.image.repository }}:{{ .Values.auth.image.tag }}"
+          imagePullPolicy: {{ .Values.auth.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          command:
+            - /usr/local/openresty/bin/openresty
+            - -c
+            - /etc/openresty/nginx.conf
+            - -g
+            - "daemon off;"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.auth.resources | nindent 12 }}
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 101
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+          volumeMounts:
+            - name: auth-config
+              mountPath: /etc/openresty
+              readOnly: true
+            - name: auth-tokens
+              mountPath: /etc/auth
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: auth-config
+          configMap:
+            name: {{ include "argocd-mcp.authFullname" . }}-config
+        - name: auth-tokens
+          secret:
+            secretName: {{ include "argocd-mcp.authFullname" . }}-tokens
+        - name: tmp
+          emptyDir: {}
+{{- end }}

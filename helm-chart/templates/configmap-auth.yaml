@@ -1,0 +1,103 @@
+{{- if .Values.auth.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "argocd-mcp.authFullname" . }}-config
+  labels:
+    {{- include "argocd-mcp.labels" . | nindent 4 }}
+data:
+  nginx.conf: |
+    worker_processes 1;
+    error_log /dev/stderr info;
+    pid /tmp/nginx.pid;
+
+    events {
+        worker_connections 256;
+    }
+
+    http {
+        client_body_temp_path /tmp/client_body;
+        proxy_temp_path /tmp/proxy;
+        fastcgi_temp_path /tmp/fastcgi;
+        uwsgi_temp_path /tmp/uwsgi;
+        scgi_temp_path /tmp/scgi;
+
+        lua_shared_dict tokens 1m;
+
+        init_by_lua_block {
+            local function load_tokens()
+                local file = io.open("/etc/auth/tokens", "r")
+                if not file then
+                    ngx.log(ngx.ERR, "failed to open tokens file")
+                    return
+                end
+                local dict = ngx.shared.tokens
+                dict:flush_all()
+                local token_count = 0
+                for line in file:lines() do
+                    local token = line:match("^%s*(.+)%s*$")
+                    if token and #token > 0 then
+                        ngx.log(ngx.INFO, "loaded token with length: " .. #token)
+                        dict:set(token, true)
+                        token_count = token_count + 1
+                    end
+                end
+                ngx.log(ngx.INFO, "total tokens loaded: " .. token_count)
+                file:close()
+            end
+            load_tokens()
+        }
+
+        server {
+            listen 8080;
+
+            location / {
+                access_by_lua_block {
+                    local auth_header = ngx.var.http_authorization
+                    if not auth_header then
+                        ngx.status = 401
+                        ngx.header["Content-Type"] = "application/json"
+                        ngx.say('{"error":"missing authorization header"}')
+                        return ngx.exit(401)
+                    end
+
+                    local token = auth_header:match("^Bearer%s+(.+)$")
+                    if not token then
+                        ngx.log(ngx.WARN, "invalid authorization format")
+                        ngx.status = 401
+                        ngx.header["Content-Type"] = "application/json"
+                        ngx.say('{"error":"invalid authorization format"}')
+                        return ngx.exit(401)
+                    end
+
+                    ngx.log(ngx.INFO, "received token with length: " .. #token)
+
+                    local dict = ngx.shared.tokens
+                    if not dict:get(token) then
+                        ngx.log(ngx.WARN, "token not found, length: " .. #token)
+                        local keys = dict:get_keys()
+                        ngx.log(ngx.INFO, "stored tokens count: " .. #keys)
+                        for i, k in ipairs(keys) do
+                            ngx.log(ngx.DEBUG, "stored token " .. i .. " length: " .. #k)
+                        end
+                        ngx.status = 401
+                        ngx.header["Content-Type"] = "application/json"
+                        ngx.say('{"error":"invalid token"}')
+                        return ngx.exit(401)
+                    end
+
+                    ngx.log(ngx.INFO, "authentication successful, token length: " .. #token)
+
+                    ngx.status = 200
+                    ngx.say('{"status":"ok"}')
+                    return ngx.exit(200)
+                }
+            }
+
+            location /healthz {
+                return 200 'ok';
+                add_header Content-Type text/plain;
+            }
+        }
+    }
+{{- end }}
