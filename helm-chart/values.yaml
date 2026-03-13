@@ -17,9 +17,7 @@ service:
 auth:
   enabled: false
   tokens:
-  - d4f88f6d9292c10cc3e21c4aad56d2be485db532b54fe961d738e1137d247823
   - 8803f621acc3898df1d7a8f514bc3602551a0681a8f747bd4e43c3c5849d57a7 # danijel
-  - 2c588a5c83a392a57afff1addaed3e5a07e3a978bcc491240ee8b18e6ded5185 #
 
 argocd:
   baseUrl: ""
