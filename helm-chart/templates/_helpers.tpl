@@ -74,11 +74,3 @@ Auth verifier fullname
 {{- define "argocd-mcp.authFullname" -}}
 {{- printf "%s-auth" (include "argocd-mcp.fullname" .) | trunc 63 | trimSuffix "-" }}
 {{- end }}
-
-{{/*
-Auth verifier selector labels
-*/}}
-{{- define "argocd-mcp.authSelectorLabels" -}}
-app.kubernetes.io/name: {{ include "argocd-mcp.name" . }}-auth
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end }}

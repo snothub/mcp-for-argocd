@@ -21,18 +21,6 @@ auth:
   - 8803f621acc3898df1d7a8f514bc3602551a0681a8f747bd4e43c3c5849d57a7 # danijel
   - 2c588a5c83a392a57afff1addaed3e5a07e3a978bcc491240ee8b18e6ded5185 #
 
-  image:
-    repository: openresty/openresty
-    tag: alpine
-    pullPolicy: IfNotPresent
-  resources:
-    requests:
-      cpu: 50m
-      memory: 32Mi
-    limits:
-      cpu: 200m
-      memory: 64Mi
-
 argocd:
   baseUrl: ""
   apiToken: ""
