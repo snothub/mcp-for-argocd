@@ -11,6 +11,9 @@ spec:
       {{- include "argocd-mcp.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      annotations:
+        policies.forteapps.io/auth: {{ .Values.auth.enabled | quote }}
+        policies.forteapps.io/auth-token-secret-name: "{{ include "argocd-mcp.authFullname" . }}-tokens"
       labels:
         {{- include "argocd-mcp.labels" . | nindent 8 }}
     spec:
