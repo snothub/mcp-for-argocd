@@ -10,6 +10,7 @@ auth:
 
 argocd:
   existingSecret: argocd-mcp-credentials
+  readOnly: true
 
 ingress:
   enabled: true
