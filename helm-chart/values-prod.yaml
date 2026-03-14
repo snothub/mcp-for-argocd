@@ -4,7 +4,7 @@ image:
   pullPolicy: IfNotPresent
 
 auth:
-  enabled: true
+  enabled: false
   tokens:
   - 8803f621acc3898df1d7a8f514bc3602551a0681a8f747bd4e43c3c5849d57a7 # danijel
 
