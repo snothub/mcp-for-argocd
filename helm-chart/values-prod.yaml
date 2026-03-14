@@ -15,3 +15,9 @@ argocd:
 ingress:
   enabled: true
   host: argocdmcp.forteapps.net
+
+extraEnv:
+- name: MCP_READ_ONLY
+  value: "true"
+
+envSecretName: "argocd-mcp-credentials"
