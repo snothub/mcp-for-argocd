@@ -1,6 +1,0 @@
-apiVersion: v2
-name: argocd-mcp
-description: MCP (Model Context Protocol) server for ArgoCD
-type: application
-version: 0.1.0
-appVersion: "latest"
